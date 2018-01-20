@@ -1,0 +1,22 @@
+# this is the readme file
+
+stage 1: make a basic working game for the client - leave the monster generation to the server, 
+only make sure that you have working controls and terrain
+
+initialization date: 17.1.18
+
+stage
+	player
+	general monster
+		monster
+goals:
+	working player controls
+	working scene - with platforms and shit
+
+goals until 22.1.18:
+	GAL:
+	build base script, upload to github as master branch.
+	working scene - with platforms and moving player
+
+	NIL:
+	 	player controls
