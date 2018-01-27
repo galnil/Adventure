@@ -1,2 +1,2 @@
 # Adventure
-this is Gal and Nil's adventure game
+this is Gal's and Nil's adventure game

@@ -4,6 +4,7 @@ import pygame as pg
 import sys
 import pylint
 import pdb
+from stage import *
 pg.init()
 
 dw = 800
@@ -15,13 +16,7 @@ FPS = 60
 white = (255, 255, 255, 255)
 black = (0, 0, 0, 255)
 
-pg.key.set_repeat(10,10) # the get_repeat method sends multiple pygame events while a key is being held down
-
-BOOL = pg.event.get_grab()
-if BOOL:
-	print('recieving keyboard input')
-else:
-	print(BOOL) # --> 0
+pg.key.set_repeat(1,10) # the get_repeat method sends multiple pygame events while a key is being held down
 
 assets_wd = './assets/'
 # importing images
@@ -31,7 +26,7 @@ ms_bk = 'bkgd.png' # 0,520 --> coordinates
 bk_path = assets_wd + ms_bk
 bkgd = pg.image.load(bk_path).convert_alpha()
 # floating platforms
-img_platform = 'rplatforms.png'
+img_platform = 'platforms.png'
 path_platform = assets_wd + img_platform
 platform = pg.image.load(path_platform).convert_alpha()
 
@@ -46,15 +41,25 @@ def events(player):
 	""" handles keyboard, exit events """
 
 	for e in pg.event.get():
-		if e.type == pg.QUIT:
+		if e.type == pg.QUIT or (e.type == pg.KEYDOWN) and (e.key == pg.K_ESCAPE):
+
 			print('exit called')
 			pg.quit()
 			sys.exit(1)
+			
 		if e.type == pg.KEYDOWN:
 				# call the move player function
-
-				event_name = pg.key.name(e.key)
-				player.move(event_name)
+			key = pg.key.get_pressed()
+				#event_name = pg.key.name(e.key)
+				#player.move(event_name)
+			if key[pg.K_RIGHT]:
+				player.move(1, 0)
+			if key[pg.K_LEFT]:
+				player.move(-1, 0)
+			if key[pg.K_UP]:
+				player.move(0, -1)
+			if key[pg.K_DOWN]:
+				player.move(0, 1)
 
 				#print('events fuc e.key: {0}'.format(e.key))
 """
@@ -153,13 +158,14 @@ class Player(pg.sprite.Sprite):
 		handling the player movement
 		"""
 	
-	def move(self, event_name):
+	def move(self, dx,dy):
 		# pygame.event.event_name(type) --> the event name as string
 		"""
 		the move functions handles the player movement.
 		args:
 			event_key - the event key indicates the name of the key pressed by the user
 		"""
+		'''
 		moves = {'right': ('x', 1), 'left': ('x', -1), 'up': ('y', -1), 'down':('y', 1)} # RIGHT, LEFT, UP, DOWN
 		# k = keyboard key, v = (axis_direction, sign)
 		if event_name in moves:
@@ -176,16 +182,21 @@ class Player(pg.sprite.Sprite):
 			
 			self._update()
 			self.key_up()
+		'''
+		self._x_change += self._SPEED * dx
+		self._y_change += self._SPEED * dy
 		
+		self._update()
+		self.key_up()
+
 	def _update(self):
 
 		self.rect.x += self._x_change
 		self.rect.y += self._y_change
-		"""
+	
 		print('__update__')
 		print('x after addition: {0}'.format(self.rect.x))
 		print('y after addition: {0}'.format(self.rect.y))
-		"""
 
 def main():
 	print ('main game')
@@ -198,28 +209,18 @@ def main():
 	running = True
 	
 	while running:
-		#print ('running!')
 		gameDisplay.fill(black)
-		#pdb.set_trace()
 		gameDisplay.blit(bkgd,(0,205))
 		gameDisplay.blit(platform, (200, 350))
 		p._show()
 		#p._update()
-		events(p)
-		"""
-		if p.rect.y < 500 and p.rect.y + p._SPEED > 500:
-			p.rect.y = 499
-			#print (p._y)
-		else:
-			#p.rect.y += p._SPEED
-			pass
-			
-		
-		#except Exception as e:
-			#print('main loop: something is not working')
+		events(p) # p is an instance of the Player class
+
+	
 		pg.display.update()
 		clock.tick(FPS)
 
 if __name__ == '__main__':
 	main()
+
 
