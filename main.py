@@ -5,11 +5,12 @@ import sys
 import pylint
 import pdb
 from stage import *
+import images
 pg.init()
 
 dw = 800
 dh = 600
-gameDisplay = pg.display.set_mode((dw, dh))
+#gameDisplay = pg.display.set_mode((dw, dh))
 clock = pg.time.Clock()
 FPS = 60
 # RGB COLORS
@@ -20,22 +21,22 @@ pg.key.set_repeat(1,10) # the get_repeat method sends multiple pygame events whi
 
 assets_wd = './assets/'
 # importing images
-		# most bottom platform on the screen
-ms_bk = 'bkgd.png' # 0,520 --> coordinates
+
+ms_bk = 'bkgd.png' # length - 960 px, height - 60 px
 
 bk_path = assets_wd + ms_bk
-bkgd = pg.image.load(bk_path).convert_alpha()
+#bkgd = pg.image.load(bk_path).convert_alpha()
 # floating platforms
 img_platform = 'platforms.png'
 path_platform = assets_wd + img_platform
-platform = pg.image.load(path_platform).convert_alpha()
+#platform = pg.image.load(path_platform).convert_alpha()
 
 # initializing player
 #player_rect = pygame.draw.rect(gameDisplay, black, (0, 600, 50, 50))
 
 object_group = pg.sprite.Group() # to add to this group --> object_group.add(object)
 
-def events(player):
+def events(player=None):
 	#print ('events called')
 
 	""" handles keyboard, exit events """
@@ -52,29 +53,33 @@ def events(player):
 			key = pg.key.get_pressed()
 				#event_name = pg.key.name(e.key)
 				#player.move(event_name)
-			if key[pg.K_RIGHT]:
-				player.move(1, 0)
-			if key[pg.K_LEFT]:
-				player.move(-1, 0)
-			if key[pg.K_UP]:
-				player.move(0, -1)
-			if key[pg.K_DOWN]:
-				player.move(0, 1)
-
+			if player == None:
+				pass
+			else:
+				if key[pg.K_RIGHT]:
+					player.move(1, 0)
+				if key[pg.K_LEFT]:
+					player.move(-1, 0)
+				if key[pg.K_UP]:
+					player.move(0, -1)
+				if key[pg.K_DOWN]:
+					player.move(0, 1)
+				
 				#print('events fuc e.key: {0}'.format(e.key))
 """
 		if e.type == pg.KEYUP:
 			player.key_up()
 			print('pg.KEYUP CALLED')
 """
-class Player(pg.sprite.Sprite):
+class Player(Platform):
 	"""
 	This Player class defines the movement and actions of the Player
 
 	returns:
 		Player object
 	"""
-	def __init__(self, width, height, img):
+	def __init__(self, image, start_pos, width, height):
+		super().__init__(image, start_pos)
 		"""
 		defining the basic features of the Player class
 		args:
@@ -90,12 +95,12 @@ class Player(pg.sprite.Sprite):
 		self._w = width 
 		self._h = height
                 
-                # image configurations
+    	# image configurations
+		"""
 		self.image = pg.image.load(img)
 		self.image = pg.transform.scale(self.image, (self._w, self._h))
 		self.rect = self.image.get_rect(center=(100,100))
-		self.rect.x = 0
-		self.rect.y = 300
+		"""
 		self._SPEED = 3
 		self._x_direction = 1
 		self._y_direction = 0
@@ -111,7 +116,7 @@ class Player(pg.sprite.Sprite):
                 #self._x += self._x_change
 		#self._y += self._y_change
 		#rect = pg.draw.rect(gameDisplay, white, [self.rect.x, self.rect.y, self._w, self._h])
-		gameDisplay.blit(self.image, (self.rect.x,self.rect.y))
+		#gameDisplay.blit(self.image, (self.rect.x,self.rect.y))
 
 	
 	def key_up(self):
@@ -120,69 +125,16 @@ class Player(pg.sprite.Sprite):
 		self._x_direction = 0
 		self._y_direction = 0
 
-	def _movement(self):
-		print('movement called')
-
-		"""
-			if e.type == pg.QUIT:
-				events(e.type)
-			if e.type == pg.KEYDOWN:
-				if e.key == pg.K_RIGHT:
-					self._x_change += self._SPEED
-					self.x_direction = 1
-					print('pressed right')
-					self.key_up()
-				if e.key == pg.K_LEFT:
-					self._x_change -= self._SPEED
-					self_x_direction = -1
-					print('pressed left')
-					self.key_up()
-				if e.key == pg.K_UP:
-					self._y_change -= self._SPEED
-					self._y_direction = -1
-					print('pressed up')
-					self.key_up()
-				if e.key == pg.K_DOWN:
-					self._y_change += self._SPEED
-					self._y_direction = 1
-					print('pressed down')
-					self.key_up()
-			
-			if e.type == pg.KEYUP:
-				#if e.key in ['K_RIGHT, K_LEFT, K_UP, K_DOWN']:
-				if e.key == 'K_RIGHT' or e.key == 'K_LEFT' or e.key == 'K_UP' or e.key == 'K_DOWN':
-					self.key_up()
-				#print('Player x,y: {0} {1}').format(self._x,self._y)
-				"""
-		"""
-		handling the player movement
-		"""
-	
 	def move(self, dx,dy):
 		# pygame.event.event_name(type) --> the event name as string
 		"""
 		the move functions handles the player movement.
 		args:
-			event_key - the event key indicates the name of the key pressed by the user
+			dx - indicates the direction to move in relation to the x-axis, 1/-1 (right/left), type: int
+			dy - indicate the direction to move in relation to the y-axis, 1/-1 (down/up), type: int
+		return Value:
+			type:None, no return specified
 		"""
-		'''
-		moves = {'right': ('x', 1), 'left': ('x', -1), 'up': ('y', -1), 'down':('y', 1)} # RIGHT, LEFT, UP, DOWN
-		# k = keyboard key, v = (axis_direction, sign)
-		if event_name in moves:
-			"move the player to the direction indicated by the event_key"
-			axis, sign = moves[event_name]
-
-			if axis == 'x':
-				self._x_change += sign*self._SPEED
-				self._x_direction = sign
-				
-			if axis == 'y':
-				self._y_change += sign*self._SPEED
-				self._y_direction = sign
-			
-			self._update()
-			self.key_up()
-		'''
 		self._x_change += self._SPEED * dx
 		self._y_change += self._SPEED * dy
 		
@@ -202,19 +154,36 @@ def main():
 	print ('main game')
         
 	#try:
-	p = Player(100, 100, 'assets/player.png')
+	#p = Player(100, 100, 'assets/player.png')
+	# initialize a stage instance
+	stage = Stage(bk_path, dw, dh)
+	stage_rect = stage.get_pos()
+	print('stage_rect: {0}'.format(stage_rect))
+	# fill stage instance
+	#stage.game_display.fill(white)
+	# adding the platform objects to the stage
+	platform1 = Platform(stage, images.platform1_path, (dw/2, dh/2))
+	platform2 = Platform(stage, images.platform2_path, (dw/3, dh/3))
+	# player initialization, adding player to stage.object_list
+	p = Player('assets/player.png', (100, 100), 100, 100)
+	#bottom_platform = Platform(stage, images.bottom_platform_path, (dw-60, dh))
+	#print(stage.object_list)# make a better representation
 	#except Exception as e:
 	#print ('could not initialize player')
 		
 	running = True
 	
 	while running:
-		gameDisplay.fill(black)
-		gameDisplay.blit(bkgd,(0,205))
-		gameDisplay.blit(platform, (200, 350))
-		p._show()
-		#p._update()
-		events(p) # p is an instance of the Player class
+		#gameDisplay.fill(black)
+		#gameDisplay.blit(bkgd,(0,dh - 60))
+		#gameDisplay.blit(platform, (200, 350))
+		
+		# fill the stage instance
+		stage.game_display.fill(black)
+		# adding the platform objects to the stage
+		stage.display_objects()
+		#p._show()
+		events() # argument is an instance of the Player class
 
 	
 		pg.display.update()

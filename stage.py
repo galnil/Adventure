@@ -2,13 +2,13 @@ import pygame as pg
 
 class Stage:
     
-    def __init__(self, background, height, width):
+    def __init__(self, background, width, height):
         self.background = pg.image.load(background)
         self.object_list = []
 
         self.height = height
         self.width = width
-        self.game_display = pg.display.set_mode((self.height, self.width))
+        self.game_display = pg.display.set_mode((self.width, self.height))
         
         self.add_object(self)
 
@@ -24,13 +24,16 @@ class Stage:
         """
         for obj in self.object_list:
             self.game_display.blit(obj.get_image(), obj.get_pos())
-        pg.display.flip()
+        pg.display.update()
 
     def get_pos(self):
         """
         return the position of the object
         """
-        return 0, 0
+        x = 0 # self.background.get_rect().x
+        y = self.height - 60 # self.background.get_rect().y
+        
+        return x, y
 
     def get_image(self):
         """
@@ -38,11 +41,12 @@ class Stage:
         """
         return self.background
 
+
 class Platform(pg.sprite.Sprite):
     
     def __init__(self, stage, image, start_pos):
-        stage.add_object(self) # adds the monster to the relevant stage
-        self.image = pg.image.load(image)
+        stage.add_object(self) # adds the platform to the relevant stage
+        self.image = pg.image.load(image).convert()
         
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = start_pos
@@ -77,7 +81,7 @@ def main():
     FPS = 60
 
     clock = pg.time.Clock()
-    st = Stage(BACKGROUND, HEIGHT, WIDTH)
+    st = Stage(BACKGROUND, WIDTH, HEIGHT)
     mo = Platform(st, MONSTER_IMAGE, (50, 50))
 
     st.display_objects()
